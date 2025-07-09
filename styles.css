@@ -1,0 +1,25 @@
+/* Reset from Slaying The Dragon on youtube */
+/* https://youtu.be/nSst4-WbEZk?t=1030 */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* --------------------------------- */
+
+body {
+    text-align: center;
+}
+
+#board {
+    background-color: black;
+    width: 50vw;
+    height: 50vh;
+}
