@@ -3,14 +3,7 @@
 let board;
 let context;
 
-const gameData = {
-  score: 0,
-  generators: 0,
-  genPower: 0.2,
-  lastGenUpdate: undefined,
-  genCost: 5,
-  hangingPoints: 0,
-};
+let gameData;
 
 const balls = new Set();
 
@@ -18,10 +11,39 @@ window.onload = function () {
   board = document.getElementById("board");
   context = board.getContext("2d");
   console.log("this fired on window.onload");
+  loadData();
   updateScore();
   setupButtonArea();
   requestAnimationFrame(update);
 };
+
+function autosave(timestamp) {
+  if (gameData.lastSave == undefined || timestamp - gameData.lastSave > 30000) {
+    localStorage.setItem("gameData", JSON.stringify(gameData));
+    gameData.lastSave = timestamp;
+    console.log("autosaved");
+  }
+}
+
+function loadData() {
+  if (localStorage.getItem("gameData") == null) {
+    gameData = {
+      score: 0,
+      generators: 0,
+      genPower: 0.2,
+      lastGenUpdate: undefined,
+      genCost: 5,
+      hangingPoints: 0,
+      // MAJOR bug with both timestamps - I think they are 
+      // relative to the webpage being opened, and to be
+      // useful for long term saves they need to be
+      // absolute.
+      lastSave: undefined,
+    };
+  } else {
+    gameData = JSON.parse(localStorage.getItem("gameData"));
+  }
+}
 
 function updateScore() {
   document.getElementById("score").textContent =
@@ -77,6 +99,7 @@ function update(timestamp) {
   updateScore();
   // request animation frame recursively
   console.log("aaaa");
+  autosave(timestamp);
   requestAnimationFrame(update);
 }
 
