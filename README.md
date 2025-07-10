@@ -16,7 +16,8 @@
   compressed into a single sprite.
 ### The website
 - it should be publicly accessible (likely through github pages)
-- it should save your progress (likely through cookies)
+- it should save your progress
+  - This will use local storage and serialized json
 - it should be able to export a text save (non-encrypted)
 - it should be able to export a text save (encrypted)
 

@@ -5,6 +5,11 @@ let context;
 
 const gameData = {
   score: 0,
+  generators: 0,
+  genPower: 0.2,
+  lastGenUpdate: undefined,
+  genCost: 5,
+  hangingPoints: 0,
 };
 
 const balls = new Set();
@@ -19,7 +24,29 @@ window.onload = function () {
 };
 
 function updateScore() {
-  document.getElementById("score").textContent = "Score: " + gameData.score;
+  document.getElementById("score").textContent =
+    "Score: " + (Math.round(gameData.score * 100) / 100).toFixed(2);
+  document.getElementById("generators").textContent =
+    "Generators : " + gameData.generators;
+}
+
+function idleScoring(timestamp) {
+  if (gameData.lastGenUpdate == undefined) {
+    gameData.lastGenUpdate = timestamp;
+  }
+  // want to consume the latest chunk of time generated
+  // and add score equal to time * power
+  const elapsed = timestamp - gameData.lastGenUpdate;
+  gameData.lastGenUpdate = timestamp;
+  // remember this is in ms
+  const scorechange =
+    (elapsed * gameData.generators * gameData.genPower) / 1000;
+  gameData.score += scorechange;
+  gameData.hangingPoints += scorechange;
+  if (gameData.hangingPoints > 1) {
+    gameData.hangingPoints -= 1;
+    addBall();
+  }
 }
 
 function setupButtonArea() {
@@ -32,6 +59,13 @@ function setupButtonArea() {
   ptbtn.onclick = pointbutton;
 
   btnarea.appendChild(ptbtn);
+
+  // add a generator button
+  const genbtn = document.createElement("button");
+  genbtn.id = "btn-generator";
+  genbtn.textContent = "Build Generator";
+  genbtn.onclick = generatorbutton;
+  btnarea.appendChild(genbtn);
 }
 
 function update(timestamp) {
@@ -39,6 +73,8 @@ function update(timestamp) {
   move(timestamp);
   // draw
   draw();
+  idleScoring(timestamp);
+  updateScore();
   // request animation frame recursively
   console.log("aaaa");
   requestAnimationFrame(update);
@@ -49,6 +85,13 @@ function pointbutton() {
   updateScore();
   addBall();
   console.log(balls);
+}
+
+function generatorbutton() {
+  if (gameData.score > gameData.genCost) {
+    gameData.score -= gameData.genCost;
+    gameData.generators += 1;
+  }
 }
 
 class Ball {
@@ -71,7 +114,7 @@ function move(timestamp) {
     ball.y += ball.velocity * (timestamp - ball.timestamp);
     ball.timestamp = timestamp;
     if (ball.y > board.height) {
-      balls.delete(ball)
+      balls.delete(ball);
     }
   }
 }
