@@ -38,6 +38,7 @@ function idleScoring(timestamp) {
   // and add score equal to time * power
   const elapsed = timestamp - gameData.lastGenUpdate;
   gameData.lastGenUpdate = timestamp;
+  // remember this is in ms
   const scorechange =
     (elapsed * gameData.generators * gameData.genPower) / 1000;
   gameData.score += scorechange;
@@ -132,7 +133,7 @@ function addBall() {
     Math.random() * board.width,
     (Math.random() * board.height) / 8,
     4,
-    4
+    4,
   );
   balls.add(ball);
 }
